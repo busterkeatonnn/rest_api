@@ -1,0 +1,26 @@
+services:
+  web:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/usr/src/app
+    command: go run ./cmd/server/main.go -b 0.0.0.0
+  db:
+    restart: always
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=user
+      - POSTGRES_DB=orders_db
+    ports:
+      - "8081:5432"
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+      - ./sql/create_database.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./sql/insert_database.sql:/docker-entrypoint-initdb.d/2-schema.sql
+
+volumes:
+  postgres-db:
